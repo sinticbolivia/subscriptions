@@ -1,0 +1,1 @@
+option('so_target', type: string, value: 'MACOS')
