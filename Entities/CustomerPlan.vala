@@ -17,11 +17,12 @@ namespace SinticBolivia.Modules.Subscriptions.Entities
         public  string      status {get;set;}
         public  SBDateTime  init_date {get;set;}
         public  SBDateTime  end_date {get;set;}
+        public  string?     notes {get; set;}
 
         construct
         {
-            this._table = "subscriptions_customer_plans";
-            this._primary_key = "id";
+            this._table         = "subscriptions_customer_plans";
+            this._primary_key   = "id";
         }
         public CustomerPlan()
         {

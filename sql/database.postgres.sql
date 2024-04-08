@@ -16,6 +16,7 @@ create table subscriptions_types(
     description             text,
     status                  varchar(32),
     discount                numeric(10,2),
+    days                    integer,
     last_modification_date  timestamp,
     creation_date           timestamp
 );

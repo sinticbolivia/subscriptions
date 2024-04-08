@@ -1,15 +1,18 @@
 using SinticBolivia;
 using SinticBolivia.Classes;
-using SinticBolivia.Modules.Subscriptions.Entities;
 using SinticBolivia.Database;
+using SinticBolivia.Modules.Subscriptions.Entities;
+using SinticBolivia.Modules.Subscriptions.Models;
 
 namespace SinticBolivia.Modules.Subscriptions.Controllers
 {
     public class SubscriptionsController : RestController
     {
+        protected   SubscriptionsModel model;
+
         construct
         {
-
+            this.model = new SubscriptionsModel();
         }
         public override RestResponse dispatch(string route, string method, RestHandler handler)
 		{
@@ -100,20 +103,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             {
                 if( id <= 0 )
                     throw new SBException.GENERAL("Invalid subscription identifier");
-                var subscription  = Entity.read<CustomerPlan>(id);
-                if( subscription == null )
-                    throw new SBException.GENERAL("The subscription does not exists");
                 var data = this.toObject<CustomerPlan>();
                 if( data == null )
                     throw new SBException.GENERAL("Invalid data, unable to update subscription");
-                subscription.plan_id    = data.plan_id;
-                subscription.customer_id = data.customer_id;
-                subscription.user_id    = data.user_id;
-                subscription.type_id    = data.type_id;
-                subscription.status     = data.status;
-                subscription.init_date  = data.init_date;
-                subscription.end_date   = data.end_date;
-                subscription.save();
+                data.id = id;
+                var subscription = this.model.update(data);
 
                 return new RestResponse(Soup.Status.OK, subscription.to_json(), "application/json");
             }
@@ -140,7 +134,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? read_payments(long id)
+        public RestResponse? read_payments(long id )
         {
             try
             {

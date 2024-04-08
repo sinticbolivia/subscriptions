@@ -52,7 +52,9 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             try
             {
                 var type = this.toObject<SinticBolivia.Modules.Subscriptions.Entities.Type>();
-                if( type.name.strip().length <= 0 )
+                if( type == null )
+                    throw new SBException.GENERAL("Invalid json object data, unable to create type");
+                if( type.name == null || type.name.strip().length <= 0 )
                     throw new SBException.GENERAL("Invalid subscription type name, unable to create it");
                 type.status = SinticBolivia.Modules.Subscriptions.Entities.Type.STATUS_ENABLED;
                 type.save();
