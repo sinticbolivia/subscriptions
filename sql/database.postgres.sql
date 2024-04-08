@@ -34,13 +34,14 @@ create table subscriptions_customer_plans(
   creation_date           timestamp
 );
 create table subscriptions_payments(
-  id                      serial primary key,
-  user_plan_id            bigint not null,
-  payment_method          varchar(32),
-  amount_paid             numeric(20,5),
+  id                        serial primary key,
+  customer_plan_id          bigint not null,
+  payment_method            varchar(32),
+  amount_paid               numeric(20,5),
   payment_type              varchar(64),
-  last_modification_date  timestamp,
-  creation_date           timestamp
+  payment_datetime          timestamp,
+  last_modification_date    timestamp,
+  creation_date             timestamp
 );
 -- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO jerry;
 -- grant all privileges on schema public to devudb;

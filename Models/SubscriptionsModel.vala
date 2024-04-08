@@ -39,12 +39,12 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             subscription.end_date       = data.end_date;
             subscription.notes          = data.notes;
             subscription.save();
-            
+
             return subscription;
         }
         public void do_payment(Payment payment) throws SBException
         {
-            if( payment.user_plan_id <= 0 )
+            if( payment.customer_plan_id <= 0 )
                 throw new SBException.GENERAL("Invalid user plan identifier");
             if( payment.payment_method.strip().length <= 0 )
                 throw new SBException.GENERAL("Invalid payment method");
@@ -71,6 +71,32 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             ;
             var items = builder.get<CustomerPlan>();
             return items;
+        }
+        public void renew(Payment payment) throws SBException
+        {
+            if( payment.customer_plan_id <= 0 )
+                throw new SBException.GENERAL("The payment does not has a customer plan identifier, unable to renew");
+            if( payment.payment_method == null || payment.payment_method.strip().length <= 0 )
+                throw new SBException.GENERAL("The payment does not has a payment method, unable to renew");
+            var subscription = payment.get_subscription();
+            if( subscription == null )
+                throw new SBException.GENERAL("The subscription for this payment does not exists, unable to renew");
+            payment.payment_type = Payment.PAYMENT_TYPE_RENEW;
+            payment.save();
+            //var plan = subscription.get_plan();
+            subscription.init_date = new SBDateTime.from_datetime(subscription.end_date.get_datetime()/*.format("%Y-%m-%d %H:%M:%S")*/);
+            subscription.end_date.get_datetime().add_days(subscription.get_stype().days);
+            subscription.status = CustomerPlan.STATUS_ENABLED;
+            subscription.save();
+        }
+        public SBCollection<CustomerPlan> read_by_customer(long id, int page = 1, int limit = 20)
+        {
+            int offset = (page <= 1) ? 0 : ((page - 1) * limit);
+            var builder = Entity.where("customer_id", "=", id)
+                .order_by("creation_date", "DESC")
+                .limit(limit, offset)
+            ;
+            return builder.get<CustomerPlan>();
         }
     }
 }

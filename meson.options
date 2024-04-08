@@ -1,1 +1,2 @@
 option('so_target', type: 'string', value: 'MACOS')
+option('libsinticbolivia', type: 'string', value: '../../vala/desktop-framework')

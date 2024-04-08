@@ -9,6 +9,7 @@ namespace SinticBolivia.Modules.Subscriptions
         public string name {get; set construct;}
         public string description {get; set construct;}
         public string version {get; set construct;}
+        public static SBConfig  config;
 
         construct
         {
@@ -16,6 +17,10 @@ namespace SinticBolivia.Modules.Subscriptions
             this.name = "Subscriptions module";
             this.description = "";
             this.version = "1.0.0";
+        }
+        public void set_config(SBConfig cfg)
+        {
+            config = cfg;
         }
         public void load()
         {

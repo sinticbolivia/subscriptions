@@ -2,7 +2,8 @@ project('Subscriptions', 'vala', 'c', version: '1.0.0')
 vapi_dir = meson.current_source_dir()  + '/src/vapi'
 inc_directories = ['.']
 SO_TARGET = get_option('so_target')
-sbframework_dir = ''
+sbframework_dir = get_option('libsinticbolivia')
+
 link_args = []
 subsystem = false
 #env = environment()
@@ -22,7 +23,7 @@ dependencies = [
     dependency('libpq'),
 ]
 if SO_TARGET == 'MACOS'
-	sbframework_dir = '../../vala/desktop-framework'
+	# sbframework_dir = '../../vala/desktop-framework'
 	add_project_arguments(['--vapidir', meson.current_source_dir() + '/' + sbframework_dir], language: 'vala')
 	dependencies += dependency('libsoup-3.0', version: '>=3.0.4')
 	dependencies += meson.get_compiler('c').find_library('SinticBolivia', dirs: meson.current_source_dir() + '/' + sbframework_dir)
@@ -30,7 +31,7 @@ if SO_TARGET == 'MACOS'
 	link_args += '-L' + meson.current_source_dir() + '/' + sbframework_dir
 	link_args += '-lSinticBolivia'
 elif SO_TARGET == 'LINUX'
-    sbframework_dir = '../../vala/desktop-framework'
+    # sbframework_dir = '../../vala/desktop-framework'
     add_project_arguments(['--vapidir', meson.current_source_dir() + '/' + sbframework_dir], language: 'vala')
     dependencies += dependency('libsoup-2.4', version: '>=2.64.2')
     dependencies += meson.get_compiler('c').find_library('SinticBolivia', dirs: meson.current_source_dir() + '/' + sbframework_dir)
