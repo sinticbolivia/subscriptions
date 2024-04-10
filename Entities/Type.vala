@@ -17,7 +17,8 @@ namespace SinticBolivia.Modules.Subscriptions.Entities
         public string?      status {get;set;}
         public double       discount {get; set;}
         public int          days {get;set;}
-        
+        public int          months {get;set;}
+
         construct
         {
             this._table = "subscriptions_types";

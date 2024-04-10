@@ -58,7 +58,6 @@ sources = [
     'rest_module.vala'
 ]
 
-
 libsubscriptions = shared_library(
 	'subscriptions',
 	sources,

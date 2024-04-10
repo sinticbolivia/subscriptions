@@ -26,11 +26,15 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
 						return this.read_all();
                     if( new Regex("""/api/subscriptions/(?P<id>\d+)/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
 						return this.read(long.parse(pathData.fetch_named("id")));
+                    if( new Regex("""/api/subscriptions/customers/(?P<id>\d+)/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
+						return this.read_customer_subscriptions(long.parse(pathData.fetch_named("id")));
                 }
 				else if( this.is_post() )
 				{
 					if( new Regex("""/api/subscriptions/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
 						return this.create();
+                    if( new Regex("""/api/subscriptions/(?P<id>\d+)/payments/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
+						return this.register_payment( long.parse(pathData.fetch_named("id")) );
 				}
                 else if( this.is_put() )
                 {
@@ -146,6 +150,41 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 var items = subscription.get_payments();
 
                 return new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? read_customer_subscriptions(long id)
+        {
+            try
+            {
+                if( id <= 0 )
+                    throw new SBException.GENERAL("Invalid customer identifier");
+                int page = this.get_int("page", 1);
+                int limit = this.get_int("limit", 20);
+
+                var items = this.model.read_by_customer(id, page, limit);
+
+                return new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? register_payment(long id)
+        {
+            try
+            {
+                if( id <= 0 )
+                    throw new SBException.GENERAL("Invalid subscription identifier");
+                var payment = this.toObject<Payment>();
+                if( payment == null )
+                    throw new SBException.GENERAL("Invalid payment data");
+                this.model.renew(payment);
+                return new RestResponse(Soup.Status.OK, payment.to_json(), "application/json");
             }
             catch(SBException e)
             {

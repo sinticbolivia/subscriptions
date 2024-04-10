@@ -7,47 +7,16 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
 {
     public class TypesController : RestController
     {
-        public override RestResponse dispatch(string route, string method, RestHandler handler)
+        public override void register_routes()
         {
-            try
-			{
-				MatchInfo pathData;
-                if( this.is_get() )
-                {
-                    if( new Regex("/api/subscriptions/types?$").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.read_all();
-                    if( new Regex("""/api/subscriptions/types/(?P<id>\d+)/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.read(long.parse(pathData.fetch_named("id")));
-                    if( new Regex("""/api/subscriptions/types/search/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.search();
-                }
-				else if( this.is_post() )
-				{
-					if( new Regex("/api/subscriptions/types/?$").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.create();
-				}
-                else if( this.is_put() )
-                {
-                    if( new Regex("""/api/subscriptions/types/(?P<id>\d+)/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.update(long.parse(pathData.fetch_named("id")));
-                }
-                else if( this.is_delete() )
-                {
-                    if( new Regex("""/api/subscriptions/types/(?P<id>\d+)/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.remove(long.parse(pathData.fetch_named("id")));
-                }
-			}
-			catch(SBException e)
-			{
-				return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
-			}
-            catch(RegexError e)
-            {
-                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
-            }
-			return new RestResponse(Soup.Status.BAD_REQUEST, "Invalid route");
+            this.add_route("GET", "/api/subscriptions/types/?$", this.read_all);
+            this.add_route("GET", """/api/subscriptions/types/(?P<id>\d+)/?$""", this.read);
+            this.add_route("GET", """/api/subscriptions/types/search/?$""", this.search);
+            this.add_route("POST", "/api/subscriptions/types/?$", this.create);
+            this.add_route("PUT", """/api/subscriptions/types/(?P<id>\d+)/?$""", this.update);
+            this.add_route("DELETE", """/api/subscriptions/types/(?P<id>\d+)/?$""", this.remove);
         }
-        public RestResponse? create()
+        public RestResponse? create(SBCallbackArgs args)
         {
             try
             {
@@ -65,7 +34,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? read_all()
+        public RestResponse? read_all(SBCallbackArgs args)
         {
             try
             {
@@ -89,10 +58,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? read(long id)
+        public RestResponse? read(SBCallbackArgs args)
         {
             try
             {
+                long id = args.get_long("id");
                 var type = Entity.read<SinticBolivia.Modules.Subscriptions.Entities.Type>(id);
                 return new RestResponse(Soup.Status.OK, type.to_json(), "application/json");
             }
@@ -101,10 +71,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? update(long id)
+        public RestResponse? update(SBCallbackArgs args)
         {
             try
             {
+                long id = args.get_long("id");
                 var oldType = Entity.read<SinticBolivia.Modules.Subscriptions.Entities.Type>(id);
                 if( oldType == null )
                     throw new SBException.GENERAL("The subscription type does not exists, unable to update");
@@ -113,6 +84,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 oldType.description     = type.description;
                 oldType.status          = type.status;
                 oldType.discount        = type.discount;
+                oldType.months          = type.months;
                 oldType.days            = type.days;
                 oldType.save();
 
@@ -123,11 +95,12 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? remove(long id)
+        public RestResponse? remove(SBCallbackArgs args)
         {
             RestResponse res;
             try
             {
+                long id = args.get_long("id");
                 var type = Entity.read<SinticBolivia.Modules.Subscriptions.Entities.Type>(id);
                 if( type == null )
                     throw new SBException.GENERAL("The plan does not exists");
@@ -140,7 +113,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             }
             return res;
         }
-        public RestResponse? search()
+        public RestResponse? search(SBCallbackArgs args)
         {
             RestResponse? res = null;
             try

@@ -48,7 +48,7 @@ namespace SinticBolivia.Modules.Subscriptions.Entities
         }
         public SBHasMany<Payment> payments()
         {
-            return this.has_many<Payment>("user_plan_id", "id");
+            return this.has_many<Payment>("customer_plan_id", "id");
         }
         public SBCollection<Payment> get_payments()
         {
