@@ -22,21 +22,23 @@ create table subscriptions_types(
     creation_date           timestamp
 );
 create table subscriptions_customer_plans(
-  id                      serial primary key,
-  plan_id                 bigint not null,
-  customer_id             bigint not null,
-  type_id                   bigint not null,
-  user_id                 bigint not null,
-  status                  varchar(32),
-  init_date               timestamp,
-  end_date                timestamp,
-  notes                     text,
-  last_modification_date  timestamp,
-  creation_date           timestamp
+    id                      serial primary key,
+    plan_id                 bigint not null,
+    customer_id             bigint not null,
+    customer                varchar(256),
+    type_id                 bigint not null,
+    user_id                 bigint not null,
+    status                  varchar(32),
+    init_date               timestamp,
+    end_date                timestamp,
+    notes                   text,
+    last_modification_date  timestamp,
+    creation_date           timestamp
 );
 create table subscriptions_payments(
   id                        serial primary key,
   customer_plan_id          bigint not null,
+  user_id                   bigint not null,
   payment_method            varchar(32),
   amount_paid               numeric(20,5),
   payment_type              varchar(64),

@@ -81,12 +81,19 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             var subscription = payment.get_subscription();
             if( subscription == null )
                 throw new SBException.GENERAL("The subscription for this payment does not exists, unable to renew");
+            var type = subscription.get_stype();
+            if( type == null )
+                throw new SBException.GENERAL("The subscription has no type, unable to renew");
             payment.payment_type = Payment.PAYMENT_TYPE_RENEW;
             payment.save();
             //var plan = subscription.get_plan();
-            subscription.init_date = new SBDateTime.from_datetime(subscription.end_date.get_datetime()/*.format("%Y-%m-%d %H:%M:%S")*/);
-            subscription.end_date.get_datetime().add_days(subscription.get_stype().days);
-            subscription.status = CustomerPlan.STATUS_ENABLED;
+            print(type.dump());
+            subscription.init_date  = new SBDateTime.from_datetime(subscription.end_date.get_datetime()/*.format("%Y-%m-%d %H:%M:%S")*/);
+            subscription.end_date   = new SBDateTime.from_datetime(
+                subscription.init_date.get_datetime().add_days(type.months > 0 ? (type.months * 30) : type.days)
+            );
+            subscription.status     = CustomerPlan.STATUS_ENABLED;
+            print(subscription.dump());
             subscription.save();
         }
         public SBCollection<CustomerPlan> read_by_customer(long id, int page = 1, int limit = 20)

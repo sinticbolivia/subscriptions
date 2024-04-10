@@ -14,50 +14,17 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
         {
             this.model = new SubscriptionsModel();
         }
-        public override RestResponse dispatch(string route, string method, RestHandler handler)
-		{
-            //print("SubscriptionsController.dispatch\n");
-			try
-			{
-				MatchInfo pathData;
-                if( this.is_get() )
-                {
-                    if( new Regex("/api/subscriptions/?$").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.read_all();
-                    if( new Regex("""/api/subscriptions/(?P<id>\d+)/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.read(long.parse(pathData.fetch_named("id")));
-                    if( new Regex("""/api/subscriptions/customers/(?P<id>\d+)/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.read_customer_subscriptions(long.parse(pathData.fetch_named("id")));
-                }
-				else if( this.is_post() )
-				{
-					if( new Regex("""/api/subscriptions/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.create();
-                    if( new Regex("""/api/subscriptions/(?P<id>\d+)/payments/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.register_payment( long.parse(pathData.fetch_named("id")) );
-				}
-                else if( this.is_put() )
-                {
-                    if( new Regex("""/api/subscriptions/(?P<id>\d+)/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.update(long.parse(pathData.fetch_named("id")));
-                }
-                else if( this.is_delete() )
-                {
-                    if( new Regex("""/api/subscriptions/(?P<id>\d+)/?$""").match(route, RegexMatchFlags.ANCHORED, out pathData) )
-						return this.remove(long.parse(pathData.fetch_named("id")));
-                }
-			}
-			catch(SBException e)
-			{
-				return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
-			}
-            catch(RegexError e)
-            {
-                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
-            }
-			return new RestResponse(Soup.Status.BAD_REQUEST, "Invalid route");
-		}
-        public RestResponse? create()
+        public override void register_routes()
+        {
+            this.add_route("GET", "/api/subscriptions/?$", this.read_all);
+            this.add_route("GET", """/api/subscriptions/(?P<id>\d+)/?$""", this.read);
+            this.add_route("GET", """/api/subscriptions/customers/(?P<id>\d+)/?$""", this.read_customer_subscriptions);
+            this.add_route("POST", """/api/subscriptions/?$""", this.create);
+            this.add_route("POST", """/api/subscriptions/(?P<id>\d+)/payments/?$""", this.register_payment);
+            this.add_route("PUT", """/api/subscriptions/(?P<id>\d+)/?$""", this.update);
+            this.add_route("DELETE", """/api/subscriptions/(?P<id>\d+)/?$""", this.remove);
+        }
+        public RestResponse? create(SBCallbackArgs args)
         {
             try
             {
@@ -70,7 +37,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? read_all()
+        public RestResponse? read_all(SBCallbackArgs args)
         {
             try
             {
@@ -85,10 +52,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? read(long id)
+        public RestResponse? read(SBCallbackArgs args)
         {
             try
             {
+                long id = args.get_long("id");
                 if( id <= 0 )
                     throw new SBException.GENERAL("Invalid subscription identifier");
                 var subscription  = Entity.read<CustomerPlan>(id);
@@ -101,10 +69,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? update(long id)
+        public RestResponse? update(SBCallbackArgs args)
         {
             try
             {
+                long id = args.get_long("id");
                 if( id <= 0 )
                     throw new SBException.GENERAL("Invalid subscription identifier");
                 var data = this.toObject<CustomerPlan>();
@@ -120,10 +89,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? remove(long id)
+        public RestResponse? remove(SBCallbackArgs args)
         {
             try
             {
+                long id = args.get_long("id");
                 if( id <= 0 )
                     throw new SBException.GENERAL("Invalid subscription identifier");
                 var subscription  = Entity.read<CustomerPlan>(id);
@@ -138,10 +108,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? read_payments(long id )
+        public RestResponse? read_payments(SBCallbackArgs args)
         {
             try
             {
+                long id = args.get_long("id");
                 if( id <= 0 )
                     throw new SBException.GENERAL("Invalid subscription identifier");
                 var subscription  = Entity.read<CustomerPlan>(id);
@@ -156,10 +127,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? read_customer_subscriptions(long id)
+        public RestResponse? read_customer_subscriptions(SBCallbackArgs args)
         {
             try
             {
+                long id = args.get_long("id");
                 if( id <= 0 )
                     throw new SBException.GENERAL("Invalid customer identifier");
                 int page = this.get_int("page", 1);
@@ -174,10 +146,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? register_payment(long id)
+        public RestResponse? register_payment(SBCallbackArgs args)
         {
             try
             {
+                long id = args.get_long("id");
                 if( id <= 0 )
                     throw new SBException.GENERAL("Invalid subscription identifier");
                 var payment = this.toObject<Payment>();

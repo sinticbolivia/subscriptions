@@ -32,7 +32,7 @@ namespace SinticBolivia.Modules.Subscriptions.Entities
         {
             return this.has_one<Type>("id", "type_id");
         }
-        public Type get_stype()
+        public SinticBolivia.Modules.Subscriptions.Entities.Type get_stype()
         {
             return this.stype().get();
         }
