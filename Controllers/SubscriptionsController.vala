@@ -23,6 +23,8 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             this.add_route("POST", """/api/subscriptions/(?P<id>\d+)/payments/?$""", this.register_payment);
             this.add_route("PUT", """/api/subscriptions/(?P<id>\d+)/?$""", this.update);
             this.add_route("DELETE", """/api/subscriptions/(?P<id>\d+)/?$""", this.remove);
+            this.add_route("GET", "/api/subscriptions/close-to-expiration/?$", this.close_to_expiration);
+            this.add_route("GET", "/api/subscriptions/month-income/?$", this.month_income);
         }
         public RestResponse? create(SBCallbackArgs args)
         {
@@ -158,6 +160,34 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                     throw new SBException.GENERAL("Invalid payment data");
                 this.model.renew(payment);
                 return new RestResponse(Soup.Status.OK, payment.to_json(), "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? close_to_expiration(SBCallbackArgs args)
+        {
+            try
+            {
+                int max_days    = this.get_int("max_days", 5);
+                int page        = this.get_int("page", 1);
+                int limit       = this.get_int("limit", 20);
+                var items       = this.model.close_to_expiration(max_days, page, limit);
+                return new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? month_income(SBCallbackArgs args)
+        {
+            try
+            {
+                var date = new DateTime.now_local();
+                double income = this.model.estimated_month_income(date.get_year(), date.get_month());
+                return new RestResponse(Soup.Status.OK, "{\"income\": %f}".printf(income), "application/json");
             }
             catch(SBException e)
             {

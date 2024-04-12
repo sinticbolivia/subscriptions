@@ -105,5 +105,28 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             ;
             return builder.get<CustomerPlan>();
         }
+        public double estimated_month_income(int year, int month)
+        {
+            var date = new DateTime.local(year, month, 1, 0, 0, 0);
+            var builder = new SBDBQuery();
+            builder.select("SUM(p.price) AS total")
+                .from("subscriptions_plans p")
+                .join("subscriptions_customer_plans cp", "cp.plan_id", "p.id")
+                .where("p.status", "=", CustomerPlan.STATUS_ENABLED)
+                .and()
+                .where_group((qb) =>
+                {
+                        qb.greater_than_or_equals("DATE(end_date)", date.format("%Y-%m-%d"))
+                            .and()
+                            .less_than("DATE(end_date)", date.add_months(1).format("%Y-%m-%d"))
+                        ;
+                })
+                //.group_by("")
+            ;
+            print(builder.sql());
+            //return 0;
+            var db_row = builder.first<SBDBRow>();
+            return db_row.GetDouble("total");
+        }
     }
 }

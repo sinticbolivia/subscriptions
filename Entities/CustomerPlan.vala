@@ -12,6 +12,7 @@ namespace SinticBolivia.Modules.Subscriptions.Entities
         public  long        id {get;set;}
         public  long        plan_id {get;set;}
         public  long        customer_id {get;set;}
+        public  string      customer {get;set;}
         public  long        type_id {get;set;}
         public  long        user_id {get;set;}
         public  string      status {get;set;}
