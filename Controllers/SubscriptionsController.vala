@@ -25,6 +25,8 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             this.add_route("DELETE", """/api/subscriptions/(?P<id>\d+)/?$""", this.remove);
             this.add_route("GET", "/api/subscriptions/close-to-expiration/?$", this.close_to_expiration);
             this.add_route("GET", "/api/subscriptions/month-income/?$", this.month_income);
+            this.add_route("GET", "/api/subscriptions/check-expired/?$", this.check_expired);
+            this.add_route("GET", "/api/subscriptions/expired/?$", this.expired);
         }
         public RestResponse? create(SBCallbackArgs args)
         {
@@ -188,6 +190,30 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 var date = new DateTime.now_local();
                 double income = this.model.estimated_month_income(date.get_year(), date.get_month());
                 return new RestResponse(Soup.Status.OK, "{\"income\": %f}".printf(income), "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? check_expired(SBCallbackArgs args)
+        {
+            try
+            {
+                this.model.check_expired();
+                return new RestResponse(Soup.Status.OK, "{}", "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? expired(SBCallbackArgs args)
+        {
+            try
+            {
+                var items = Entity.where("status", "=", CustomerPlan.STATUS_EXPIRED).get<CustomerPlan>();
+                return new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
             }
             catch(SBException e)
             {

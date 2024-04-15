@@ -128,5 +128,23 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             var db_row = builder.first<SBDBRow>();
             return db_row.GetDouble("total");
         }
+        public void check_expired()
+        {
+            var date = new DateTime.now_local();
+            var builder = new SBDBQuery();
+            builder.select("id")
+                .from("subscriptions_customer_plans")
+                .where("status", "=", CustomerPlan.STATUS_ENABLED)
+                .and()
+                .less_than("DATE(end_date)", date.format("%Y-%m-%d"))
+                .order_by("end_date", "ASC")
+            ;
+            var subscriptions = builder.get<CustomerPlan>();
+            foreach(var subscription in subscriptions.items)
+            {
+                subscription.status = CustomerPlan.STATUS_EXPIRED;
+                subscription.save();
+            }
+        }
     }
 }

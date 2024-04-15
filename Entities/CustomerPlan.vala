@@ -5,9 +5,10 @@ namespace SinticBolivia.Modules.Subscriptions.Entities
 {
     public class CustomerPlan : Entity
     {
-        public  const   string STATUS_ENABLED = "enabled";
-        public  const   string STATUS_DISABLED = "disabled";
+        public  const   string STATUS_ENABLED   = "enabled";
+        public  const   string STATUS_DISABLED  = "disabled";
         public  const   string STATUS_CANCELLED = "cancelled";
+        public  const   string STATUS_EXPIRED   = "expired";
 
         public  long        id {get;set;}
         public  long        plan_id {get;set;}
