@@ -53,8 +53,7 @@ namespace SinticBolivia.Modules.Subscriptions.Models
         public SBCollection<CustomerPlan> close_to_expiration(int max_days, int page = 1, int limit = 20)
         {
             var init_date = new SBDateTime();
-            var end_date = new SBDateTime();
-            end_date.get_datetime().add_days(max_days);
+            var end_date = init_date.get_datetime().add_days(max_days);
 
             var builder = Entity.where("status", "=", CustomerPlan.STATUS_ENABLED)
                     .and()
@@ -131,9 +130,8 @@ namespace SinticBolivia.Modules.Subscriptions.Models
         public void check_expired()
         {
             var date = new DateTime.now_local();
-            var builder = new SBDBQuery();
-            builder.select("id")
-                .from("subscriptions_customer_plans")
+            var builder = Entity//.select("*")
+                //.from("subscriptions_customer_plans")
                 .where("status", "=", CustomerPlan.STATUS_ENABLED)
                 .and()
                 .less_than("DATE(end_date)", date.format("%Y-%m-%d"))
