@@ -132,7 +132,7 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             var date = new DateTime.now_local();
             var builder = Entity//.select("*")
                 //.from("subscriptions_customer_plans")
-                .where("status", "=", CustomerPlan.STATUS_ENABLED)
+                .where("status", "<>", CustomerPlan.STATUS_EXPIRED)
                 .and()
                 .less_than("DATE(end_date)", date.format("%Y-%m-%d"))
                 .order_by("end_date", "ASC")
