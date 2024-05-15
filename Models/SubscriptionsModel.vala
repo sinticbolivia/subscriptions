@@ -127,6 +127,27 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             var db_row = builder.first<SBDBRow>();
             return db_row.GetDouble("total");
         }
+        public double month_income(int year, int month)
+        {
+            var date = new DateTime.local(year, month, 1, 0, 0, 0);
+            var builder = new SBDBQuery();
+            builder.select("SUM(p.amount_paid) AS total")
+                .from("subscriptions_payments p")
+                .where()
+                .where_group((qb) =>
+                {
+                        qb.greater_than_or_equals("DATE(creation_date)", date.format("%Y-%m-%d"))
+                            .and()
+                            .less_than("DATE(creation_date)", date.add_months(1).format("%Y-%m-%d"))
+                        ;
+                })
+                //.group_by("")
+            ;
+            print(builder.sql());
+            //return 0;
+            var db_row = builder.first<SBDBRow>();
+            return db_row.GetDouble("total");
+        }
         public void check_expired()
         {
             var date = new DateTime.now_local();

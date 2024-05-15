@@ -24,6 +24,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             this.add_route("PUT", """/api/subscriptions/(?P<id>\d+)/?$""", this.update);
             this.add_route("DELETE", """/api/subscriptions/(?P<id>\d+)/?$""", this.remove);
             this.add_route("GET", "/api/subscriptions/close-to-expiration/?$", this.close_to_expiration);
+            this.add_route("GET", "/api/subscriptions/estimated-month-income/?$", this.estimated_month_income);
             this.add_route("GET", "/api/subscriptions/month-income/?$", this.month_income);
             this.add_route("GET", "/api/subscriptions/check-expired/?$", this.check_expired);
             this.add_route("GET", "/api/subscriptions/expired/?$", this.expired);
@@ -183,12 +184,25 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
-        public RestResponse? month_income(SBCallbackArgs args)
+        public RestResponse? estimated_month_income(SBCallbackArgs args)
         {
             try
             {
                 var date = new DateTime.now_local();
                 double income = this.model.estimated_month_income(date.get_year(), date.get_month());
+                return new RestResponse(Soup.Status.OK, "{\"income\": %f}".printf(income), "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? month_income(SBCallbackArgs args)
+        {
+            try
+            {
+                var date = new DateTime.now_local();
+                double income = this.model.month_income(date.get_year(), date.get_month());
                 return new RestResponse(Soup.Status.OK, "{\"income\": %f}".printf(income), "application/json");
             }
             catch(SBException e)
