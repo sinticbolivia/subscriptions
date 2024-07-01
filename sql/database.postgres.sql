@@ -47,6 +47,7 @@ create table subscriptions_payments(
     creation_date             timestamp
 );
 -- ALTER DATABASE subscriptions OWNER TO devudb;
+-- alter table [table_name] owner to [db_user];
 -- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO jerry;
 -- grant all privileges on schema public to devudb;
 -- grant all privileges on ALL SEQUENCES in schema public to devudb;

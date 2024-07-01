@@ -28,6 +28,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             this.add_route("GET", "/api/subscriptions/month-income/?$", this.month_income);
             this.add_route("GET", "/api/subscriptions/check-expired/?$", this.check_expired);
             this.add_route("GET", "/api/subscriptions/expired/?$", this.expired);
+
         }
         public RestResponse? create(SBCallbackArgs args)
         {
@@ -49,8 +50,19 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 int limit   = this.get_int("limit", 20);
                 int page    = this.get_int("page", 1);
                 int offset  = (page > 1) ? ((page-1) * limit) : 0;
-                var items   = Entity.limit(limit, offset).get<CustomerPlan>();
-                return new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+                long count  = Entity.count<CustomerPlan>();
+                long total_pages = (long)Math.ceil(count/limit);
+
+                var items   = Entity
+                    .order_by("creation_date", "DESC")
+                    .limit(limit, offset)
+                    .get<CustomerPlan>()
+                ;
+                var res     = new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+                res.add_header("total-rows", count.to_string())
+                    .add_header("total-pages", total_pages.to_string())
+                ;
+                return res;
             }
             catch(SBException e)
             {
@@ -234,5 +246,6 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
+
     }
 }

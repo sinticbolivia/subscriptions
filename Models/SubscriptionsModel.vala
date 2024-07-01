@@ -3,6 +3,9 @@ using SinticBolivia;
 using SinticBolivia.Database;
 using SinticBolivia.Classes;
 using SinticBolivia.Modules.Subscriptions.Entities;
+using SinticBolivia.Modules.Subscriptions.Services;
+using SinticBolivia.Modules.Subscriptions.Dto;
+
 
 namespace SinticBolivia.Modules.Subscriptions.Models
 {
@@ -136,10 +139,10 @@ namespace SinticBolivia.Modules.Subscriptions.Models
                 .where()
                 .where_group((qb) =>
                 {
-                        qb.greater_than_or_equals("DATE(creation_date)", date.format("%Y-%m-%d"))
-                            .and()
-                            .less_than("DATE(creation_date)", date.add_months(1).format("%Y-%m-%d"))
-                        ;
+                    qb.greater_than_or_equals("DATE(creation_date)", date.format("%Y-%m-%d"))
+                        .and()
+                        .less_than("DATE(creation_date)", date.add_months(1).format("%Y-%m-%d"))
+                    ;
                 })
                 //.group_by("")
             ;
@@ -158,11 +161,25 @@ namespace SinticBolivia.Modules.Subscriptions.Models
                 .less_than("DATE(end_date)", date.format("%Y-%m-%d"))
                 .order_by("end_date", "ASC")
             ;
+            var whatsapp = new ServiceWhatsApp();
             var subscriptions = builder.get<CustomerPlan>();
             foreach(var subscription in subscriptions.items)
             {
                 subscription.status = CustomerPlan.STATUS_EXPIRED;
                 subscription.save();
+                var msg = new DtoWhatsAppMessage();
+                msg.customer = subscription.customer;
+                msg.phone = "";//subscription.phone;
+                msg.message = """Estimado %s
+                Le recordamos que su suscripción "%s" ha expirado.
+                Realize la renovación de su suscripción para evitar inconvenientes.
+
+                Saludos.
+                Sintic Bolivia
+                +591 77739265
+                +591 78988733
+                """.printf(msg.customer, subscription.get_plan().name);
+                //whatsapp.send_message(msg);
             }
         }
     }

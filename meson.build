@@ -50,6 +50,8 @@ sources = [
 	'Entities/CustomerPlan.vala',
     'Entities/Payment.vala',
 	'Entities/Type.vala',
+	'Dto/DtoWhatsAppMessage.vala',
+	'Services/ServiceWhatsApp.vala',
     'Models/SubscriptionsModel.vala',
     'Models/PlansModel.vala',
     'Controllers/SubscriptionsController.vala',
