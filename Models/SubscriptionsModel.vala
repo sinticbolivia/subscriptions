@@ -35,6 +35,7 @@ namespace SinticBolivia.Modules.Subscriptions.Models
 
             subscription.plan_id        = data.plan_id;
             subscription.customer_id    = data.customer_id;
+            subscription.customer       = data.customer;
             subscription.user_id        = data.user_id;
             subscription.type_id        = data.type_id;
             subscription.status         = data.status;

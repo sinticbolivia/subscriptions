@@ -35,7 +35,8 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             try
             {
                 var subscription = this.toObject<CustomerPlan>();
-                subscription.save();
+                //subscription.save();
+                this.model.create(subscription);
                 return new RestResponse(Soup.Status.CREATED, subscription.to_json(), "application/json");
             }
             catch(SBException e)
