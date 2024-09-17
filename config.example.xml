@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config version="1.0">
+    <database_engine>postgres</database_engine>
+    <db_server>127.0.0.1</db_server>
+    <db_name>subscriptions</db_name>
+    <db_user>subsudb</db_user>
+    <db_pass>[subsudb]</db_pass>
+    <db_port>5432</db_port>
+    <modules_path>/Modules</modules_path>
+    <modules>
+        <![CDATA[
+        [
+            "libsubscriptions.so"
+        ]
+        ]]>
+    </modules>
+    <server_port>2205</server_port>
+    <services>
+        <service name="service_waapi_base">http://whatsapp.domain.com/api</service>
+        <service name="service_waapi_message">http://whatsapp.domain.com/api/devices/send-message</service>
+        <service name="service_waapi_batch_message">http://whatsapp.domain.com/api/devices/send-batch-message</service>
+    </services>
+    <parameters>
+        <waapi_token>your_whatsapp_device_token_here</waapi_token>
+    </parameter>
+</config>

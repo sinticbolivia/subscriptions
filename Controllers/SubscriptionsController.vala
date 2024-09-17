@@ -222,6 +222,23 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
+        /**
+         * Controller method for cron job. The controller method checks de subscription close to expire
+         * and sends a customer whatsapp message reminder
+         *
+         **/
+        public RestResponse? check_close_to_expire(SBCallbackArgs args)
+        {
+            try
+            {
+                this.model.check_close_to_expire();
+                return new RestResponse(Soup.Status.OK, "{}", "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
         public RestResponse? check_expired(SBCallbackArgs args)
         {
             try

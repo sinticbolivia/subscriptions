@@ -69,8 +69,9 @@ namespace SinticBolivia.Modules.Subscriptions.Models
                         ;
                     })
                 .order_by("end_date", "ASC")
-                .limit(limit)
             ;
+            if( limit > 0 )
+                builder.limit(limit);
             var items = builder.get<CustomerPlan>();
             return items;
         }
@@ -151,6 +152,33 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             var db_row = builder.first<SBDBRow>();
             return db_row.GetDouble("total");
         }
+        public void check_close_to_expire(int days = 5)
+        {
+            string message_tpl = """
+            Estimado %s
+            Le recordamos que su suscripción "%s" expira el %s.
+            Realize la renovación de su suscripción para evitar inconvenientes.
+
+            Saludos.
+            Sintic Bolivia
+            +591 77739265
+            +591 78988733
+            """;
+            var whatsapp = new ServiceWhatsApp();
+            SBCollection<CustomerPlan> items = this.close_to_expiration(days, 1, -1);
+            foreach(var subscription in items.items)
+            {
+                var msg = new DtoWhatsAppMessage();
+                msg.customer = subscription.customer;
+                msg.phone = "";
+                msg.message = msg.message.printf(
+                    msg.customer,
+                    subscription.end_date.format("%d-%m-%Y"),
+                    subscription.get_plan().name
+                );
+                whatsapp.send_message(msg);
+            }
+        }
         public void check_expired()
         {
             var date = new DateTime.now_local();
@@ -179,7 +207,7 @@ namespace SinticBolivia.Modules.Subscriptions.Models
                 +591 77739265
                 +591 78988733
                 """.printf(msg.customer, subscription.get_plan().name);
-                //whatsapp.send_message(msg);
+                whatsapp.send_message(msg);
             }
         }
     }
