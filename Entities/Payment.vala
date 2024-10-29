@@ -13,7 +13,8 @@ namespace SinticBolivia.Modules.Subscriptions.Entities
         public  string  payment_method {get;set;}
         public  double  amount_paid {get;set;}
         public  string  payment_type {get;set;}
-
+        public  SBDateTime  payment_datetime {get;set;}
+        
         construct
         {
             this._table = "subscriptions_payments";

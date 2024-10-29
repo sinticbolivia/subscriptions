@@ -88,6 +88,9 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             var type = subscription.get_stype();
             if( type == null )
                 throw new SBException.GENERAL("The subscription has no type, unable to renew");
+            if( payment.payment_datetime == null )
+                payment.payment_datetime = new SBDateTime();
+
             payment.payment_type = Payment.PAYMENT_TYPE_RENEW;
             payment.save();
             //var plan = subscription.get_plan();

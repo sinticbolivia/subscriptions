@@ -46,6 +46,7 @@ create table subscriptions_payments(
     last_modification_date    timestamp,
     creation_date             timestamp
 );
+-- SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'sinticbo_testdb' AND leader_pid IS NULL;
 -- ALTER DATABASE subscriptions OWNER TO devudb;
 -- alter table [table_name] owner to [db_user];
 -- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO jerry;

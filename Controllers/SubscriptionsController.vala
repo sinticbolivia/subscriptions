@@ -28,7 +28,9 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             this.add_route("GET", "/api/subscriptions/month-income/?$", this.month_income);
             this.add_route("GET", "/api/subscriptions/check-expired/?$", this.check_expired);
             this.add_route("GET", "/api/subscriptions/expired/?$", this.expired);
-
+            this.add_route("GET", """/api/subscriptions/archived/?$""", this.read_all_archived);
+            this.add_route("GET", """/api/subscriptions/(?P<id>\d+)/archive/?$""", this.archive);
+            this.add_route("GET", """/api/subscriptions/(?P<id>\d+)/dearchive/?$""", this.dearchive);
         }
         public RestResponse? create(SBCallbackArgs args)
         {
@@ -264,6 +266,72 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
             }
         }
+        public RestResponse? read_all_archived(SBCallbackArgs args)
+        {
+            try
+            {
+                int limit   = this.get_int("limit", 20);
+                int page    = this.get_int("page", 1);
+                int offset  = (page > 1) ? ((page-1) * limit) : 0;
+                long count  = Entity.count<CustomerPlan>();
+                long total_pages = (long)Math.ceil(count/limit);
 
+                var items   = Entity
+                    .where('archived', '=', 1)
+                    .order_by("creation_date", "DESC")
+                    .limit(limit, offset)
+                    .get<CustomerPlan>()
+                ;
+                var res     = new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+                res.add_header("total-rows", count.to_string())
+                    .add_header("total-pages", total_pages.to_string())
+                ;
+                return res;
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? archive(SBCallbackArgs args)
+        {
+            try
+            {
+                long id = args.get_long("id");
+                if( id <= 0 )
+                    throw new SBException.GENERAL("Invalid subscription identifier");
+                var subscription  = Entity.read<CustomerPlan>(id);
+                if( subscription == null )
+                    throw new SBException.GENERAL("The subscription does not exists");
+                subscription.archived = 1;
+                subscription.save();
+
+                return new RestResponse(Soup.Status.OK, subscription.to_json(), "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? dearchive(SBCallbackArgs args)
+        {
+            try
+            {
+                long id = args.get_long("id");
+                if( id <= 0 )
+                    throw new SBException.GENERAL("Invalid subscription identifier");
+                var subscription  = Entity.read<CustomerPlan>(id);
+                if( subscription == null )
+                    throw new SBException.GENERAL("The subscription does not exists");
+                subscription.archived = 0;
+                subscription.save();
+
+                return new RestResponse(Soup.Status.OK, subscription.to_json(), "application/json");
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
     }
 }

@@ -20,6 +20,7 @@ namespace SinticBolivia.Modules.Subscriptions.Entities
         public  SBDateTime  init_date {get;set;}
         public  SBDateTime  end_date {get;set;}
         public  string?     notes {get; set;}
+        public  int         archived {get;set;default = 0;}
 
         construct
         {
