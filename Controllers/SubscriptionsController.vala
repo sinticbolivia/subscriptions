@@ -277,7 +277,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 long total_pages = (long)Math.ceil(count/limit);
 
                 var items   = Entity
-                    .where('archived', '=', 1)
+                    .where("archived", "=", 1)
                     .order_by("creation_date", "DESC")
                     .limit(limit, offset)
                     .get<CustomerPlan>()
