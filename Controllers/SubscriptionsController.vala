@@ -53,7 +53,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 int limit   = this.get_int("limit", 20);
                 int page    = this.get_int("page", 1);
                 int offset  = (page > 1) ? ((page-1) * limit) : 0;
-                long count  = Entity.where("archived", "<>", 1).count<CustomerPlan>();
+                long count  = Entity.where("archived", "<>", 1).get_count<CustomerPlan>("id");
                 long total_pages = (long)Math.ceil(count/limit);
 
                 var items   = Entity
