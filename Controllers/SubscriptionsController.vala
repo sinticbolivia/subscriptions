@@ -260,6 +260,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             try
             {
                 var items = Entity.where("status", "=", CustomerPlan.STATUS_EXPIRED)
+                    .and()
                     .where("archived", "<>", 1)
 					.order_by("end_date", "DESC")
 					.get<CustomerPlan>();
