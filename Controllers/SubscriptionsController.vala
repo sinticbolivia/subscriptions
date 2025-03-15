@@ -263,7 +263,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                     .where("archived", "<>", 1)
 					.order_by("end_date", "DESC")
 					.get<CustomerPlan>();
-                return new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+                return new RestResponseJson(Soup.Status.OK, items);
             }
             catch(SBException e)
             {
