@@ -53,7 +53,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 int limit   = this.get_int("limit", 20);
                 int page    = this.get_int("page", 1);
                 int offset  = (page > 1) ? ((page-1) * limit) : 0;
-                long count  = Entity.count<CustomerPlan>();
+                long count  = Entity.where("archived", "<>", 1).count<CustomerPlan>();
                 long total_pages = (long)Math.ceil(count/limit);
 
                 var items   = Entity
@@ -259,7 +259,10 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
         {
             try
             {
-                var items = Entity.where("status", "=", CustomerPlan.STATUS_EXPIRED).get<CustomerPlan>();
+                var items = Entity.where("status", "=", CustomerPlan.STATUS_EXPIRED)
+                    .where("archived", "<>", 1)
+					.order_by("end_date", "DESC")
+					.get<CustomerPlan>();
                 return new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
             }
             catch(SBException e)
