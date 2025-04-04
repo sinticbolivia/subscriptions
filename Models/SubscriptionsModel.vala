@@ -60,15 +60,15 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             var end_date = init_date.get_datetime().add_days(max_days);
 
             var builder = Entity.where("status", "=", CustomerPlan.STATUS_ENABLED)
-                    .and()
-                    .where_group((qb) =>
-                    {
-                        qb
-                            .greater_than_or_equals("DATE(end_date)", init_date.format("%Y-%m-%d"))
-                            .and()
-                            .less_than_or_equals("DATE(end_date)", end_date.format("%Y-%m-%d"))
-                        ;
-                    })
+                .and()
+                .where_group((qb) =>
+                {
+                    qb
+                        .greater_than_or_equals("DATE(end_date)", init_date.format("%Y-%m-%d"))
+                        .and()
+                        .less_than_or_equals("DATE(end_date)", end_date.format("%Y-%m-%d"))
+                    ;
+                })
                 .order_by("end_date", "ASC")
             ;
             if( limit > 0 )
@@ -76,7 +76,7 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             var items = builder.get<CustomerPlan>();
             return items;
         }
-        public void renew(Payment payment) throws SBException
+        public void renew(Payment payment, SBDateTime? init_date = null, SBDateTime? end_date = null) throws SBException
         {
             if( payment.customer_plan_id <= 0 )
                 throw new SBException.GENERAL("The payment does not has a customer plan identifier, unable to renew");
@@ -95,10 +95,19 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             payment.save();
             //var plan = subscription.get_plan();
             print(type.dump());
-            subscription.init_date  = new SBDateTime.from_datetime(subscription.end_date.get_datetime()/*.format("%Y-%m-%d %H:%M:%S")*/);
-            subscription.end_date   = new SBDateTime.from_datetime(
-                subscription.init_date.get_datetime().add_days(type.months > 0 ? (type.months * 30) : type.days)
-            );
+            if( init_date != null && end_date != null )
+            {
+                subscription.init_date = init_date;
+                subscription.end_date = end_date;
+            }
+            else
+            {
+                subscription.init_date  = new SBDateTime.from_datetime(subscription.end_date.get_datetime()/*.format("%Y-%m-%d %H:%M:%S")*/);
+                subscription.end_date   = new SBDateTime.from_datetime(
+                    subscription.init_date.get_datetime().add_days(type.months > 0 ? (type.months * 30) : type.days)
+                );
+            }
+
             subscription.status     = CustomerPlan.STATUS_ENABLED;
             print(subscription.dump());
             subscription.save();

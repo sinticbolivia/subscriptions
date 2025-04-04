@@ -17,7 +17,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
         public override void register_routes()
         {
             this.add_route("GET", "/api/subscriptions/?$", this.read_all);
-            this.add_route("GET", """/api/subscriptions/(?P<id>\d+)/?$""", this.read);
+            this.add_route("GET", "/api/subscriptions/(?P<id>\\d+)/?$", this.read);
             this.add_route("GET", """/api/subscriptions/customers/(?P<id>\d+)/?$""", this.read_customer_subscriptions);
             this.add_route("POST", """/api/subscriptions/?$""", this.create);
             this.add_route("POST", """/api/subscriptions/(?P<id>\d+)/payments/?$""", this.register_payment);
@@ -160,7 +160,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
 
                 var items = this.model.read_by_customer(id, page, limit);
 
-                return new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+                return new RestResponseJson(Soup.Status.OK, items);
             }
             catch(SBException e)
             {
@@ -177,8 +177,11 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 var payment = this.toObject<Payment>();
                 if( payment == null )
                     throw new SBException.GENERAL("Invalid payment data");
-                this.model.renew(payment);
-                return new RestResponse(Soup.Status.OK, payment.to_json(), "application/json");
+                var data = this.to_json_object();
+                SBDateTime? init_date = data.has_member("init_date") ? new SBDateTime.from_string(data.get_string_member("init_date")) : null;
+                SBDateTime? end_date = data.has_member("end_date") ? new SBDateTime.from_string(data.get_string_member("end_date")) : null;
+                this.model.renew(payment, init_date, end_date);
+                return new RestResponseJson(Soup.Status.OK, payment);
             }
             catch(SBException e)
             {
@@ -193,7 +196,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 int page        = this.get_int("page", 1);
                 int limit       = this.get_int("limit", 20);
                 var items       = this.model.close_to_expiration(max_days, page, limit);
-                return new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+                return new RestResponseJson(Soup.Status.OK, items);
             }
             catch(SBException e)
             {
@@ -287,7 +290,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                     .limit(limit, offset)
                     .get<CustomerPlan>()
                 ;
-                var res     = new RestResponse(Soup.Status.OK, items.to_json(), "application/json");
+                var res     = new RestResponseJson(Soup.Status.OK, items);
                 res.add_header("total-rows", count.to_string())
                     .add_header("total-pages", total_pages.to_string())
                 ;
@@ -311,7 +314,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 subscription.archived = 1;
                 subscription.save();
 
-                return new RestResponse(Soup.Status.OK, subscription.to_json(), "application/json");
+                return new RestResponseJson(Soup.Status.OK, subscription);
             }
             catch(SBException e)
             {
@@ -331,7 +334,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 subscription.archived = 0;
                 subscription.save();
 
-                return new RestResponse(Soup.Status.OK, subscription.to_json(), "application/json");
+                return new RestResponseJson(Soup.Status.OK, subscription);
             }
             catch(SBException e)
             {
