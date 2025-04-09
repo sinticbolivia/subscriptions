@@ -29,6 +29,17 @@ if not dsoup.found()
 	prj_args += ['-D', '__SOUP_VERSION_2_70__']
 	message('LIBSOUP 2 FOUND')
 endif
+# MYSQL
+mysql = dependency('mysql', required: false)
+if not mysql.found()
+  mysql = dependency('mysqlclient', required: false)
+endif
+if not mysql.found()
+  mysql = dependency('mariadb', required: false)
+endif
+if not mysql.found()
+  error('Unable to find mysql client library')
+endif
 
 dependencies = [
 	dependency('glib-2.0'),
@@ -40,7 +51,7 @@ dependencies = [
 	dsoup,
 	dependency('sqlite3'),
 	#meson.get_compiler('vala').find_library('mysql'),
-	dependency('mysql'),
+	mysql,
 	dependency('libpq'),
 	meson.get_compiler('c').find_library('SinticBolivia', dirs: sbframework_dir)
 ]
