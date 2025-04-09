@@ -14,6 +14,7 @@ subsystem = false
 #env = environment()
 #env.append('PKG_CONFIG_PATH', '')
 prj_args = [
+  '--vapidir', meson.current_source_dir() + '/vapi',
   '--pkg', 'SinticBolivia',
   '--vapidir', sbframework_dir,
 ]
