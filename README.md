@@ -1,5 +1,7 @@
 # Compilation
 
+Parameters description.
+
 path_sinticbolivia_lib: Needs to be an absolute path
 
 ## Debug compilation

@@ -69,6 +69,7 @@ message('MESON BASE DIR', meson.current_source_dir() )
 message('SBFRAMEWORK PATH: ' + sbframework_dir)
 
 sources = [
+  'Helpers/HelperDates.vala',
   'Entities/Plan.vala',
   'Entities/UserPlan.vala',
 	'Entities/CustomerPlan.vala',

@@ -5,7 +5,7 @@ using SinticBolivia.Classes;
 using SinticBolivia.Modules.Subscriptions.Entities;
 using SinticBolivia.Modules.Subscriptions.Services;
 using SinticBolivia.Modules.Subscriptions.Dto;
-
+using SinticBolivia.Modules.Subscriptions.Helpers;
 
 namespace SinticBolivia.Modules.Subscriptions.Models
 {
@@ -177,6 +177,7 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             +591 77739265
             +591 78988733
             """;
+
             var whatsapp = new ServiceWhatsApp();
             SBCollection<CustomerPlan> items = this.close_to_expiration(days, 1, -1);
             foreach(var subscription in items.items)
@@ -222,6 +223,28 @@ namespace SinticBolivia.Modules.Subscriptions.Models
                 """.printf(msg.customer, subscription.get_plan().name);
                 whatsapp.send_message(msg);
             }
+        }
+        public SBCollection<CustomerPlan> month_expires(int year, int month, int page = 1, int limit = 20)
+        {
+            var init_date = HelperDates.get_month_first_day(year, month);
+            var end_date = HelperDates.get_month_last_day_from_datetime(init_date);
+
+            var builder = Entity.where("status", "=", CustomerPlan.STATUS_ENABLED)
+                .and()
+                .where_group((qb) =>
+                {
+                    qb.greater_than_or_equals("DATE(end_date)", init_date.format("%Y-%m-%d"))
+                        .and()
+                        .less_than_or_equals("DATE(end_date)", end_date.format("%Y-%m-%d"))
+                    ;
+                })
+                .order_by("end_date", "ASC")
+            ;
+            if( limit > 0 )
+                builder.limit(limit);
+            debug("MONTH_EXPIRES SQL: %s", builder.sql());
+            var items = builder.get<CustomerPlan>();
+            return items;
         }
     }
 }

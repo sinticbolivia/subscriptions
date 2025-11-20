@@ -31,6 +31,7 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
             this.add_route("GET", """/api/subscriptions/archived/?$""", this.read_all_archived);
             this.add_route("GET", """/api/subscriptions/(?P<id>\d+)/archive/?$""", this.archive);
             this.add_route("GET", """/api/subscriptions/(?P<id>\d+)/dearchive/?$""", this.dearchive);
+            this.add_route("GET", "/api/subscriptions/check-month-expires/?$", this.check_month_expires);
         }
         public RestResponse? create(SBCallbackArgs args)
         {
@@ -335,6 +336,23 @@ namespace SinticBolivia.Modules.Subscriptions.Controllers
                 subscription.save();
 
                 return new RestResponseJson(Soup.Status.OK, subscription);
+            }
+            catch(SBException e)
+            {
+                return new RestResponse(Soup.Status.INTERNAL_SERVER_ERROR, e.message);
+            }
+        }
+        public RestResponse? check_month_expires(SBCallbackArgs args)
+        {
+            try
+            {
+                var c_date      = new DateTime.now_local();
+                int year        = this.get_int("year", c_date.get_year());
+                int month        = this.get_int("month", c_date.get_month());
+                int page        = this.get_int("page", 1);
+                int limit       = this.get_int("limit", 20);
+                var items       = this.model.month_expires(year, month, page, limit);
+                return new RestResponseJson(Soup.Status.OK, items);
             }
             catch(SBException e)
             {
