@@ -242,7 +242,8 @@ namespace SinticBolivia.Modules.Subscriptions.Models
             ;
             if( limit > 0 )
                 builder.limit(limit);
-            debug("MONTH_EXPIRES SQL: %s", builder.sql());
+
+            //debug("MONTH_EXPIRES SQL: %s", builder.sql());
             var items = builder.get<CustomerPlan>();
             return items;
         }

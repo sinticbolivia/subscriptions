@@ -12,6 +12,14 @@ cd build
 meson compile
 ```
 
+For DEBUG, your needs to execute the launcher or API application using G_MESSAGES_DEBUG=all
+
+Example:
+
+```
+G_MESSAGES_DEBUG=all ./api
+```
+
 ## Release compilation
 
 ```
