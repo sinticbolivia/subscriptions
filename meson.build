@@ -39,7 +39,10 @@ if not mysql.found()
   mysql = dependency('mariadb', required: false)
 endif
 if not mysql.found()
-  error('Unable to find mysql client library')
+  mysql = dependency('libmariadb', required: false)
+endif
+if not mysql.found()
+  error('Unable to find mysql/mariadb client library')
 endif
 
 dependencies = [
@@ -75,6 +78,8 @@ sources = [
 	'Entities/CustomerPlan.vala',
   'Entities/Payment.vala',
 	'Entities/Type.vala',
+	'Entities/Tag.vala',
+	'Entities/TagObject.vala',
 	'Dto/DtoWhatsAppMessage.vala',
 	'Services/ServiceWhatsApp.vala',
   'Models/SubscriptionsModel.vala',
